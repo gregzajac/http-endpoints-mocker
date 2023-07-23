@@ -1,4 +1,4 @@
-# pre stage
+# tmp stage
 FROM python:3.11-slim-bullseye as builder
 
 ENV PIP_DEFAULT_TIMEOUT=100 \
@@ -7,14 +7,14 @@ ENV PIP_DEFAULT_TIMEOUT=100 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-WORKDIR /prestage
+WORKDIR /tmp
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends gcc
 
 COPY requirements.txt .
 
-RUN pip wheel --no-cache-dir --no-deps --wheel-dir /prestage/wheels -r requirements.txt
+RUN pip wheel --no-cache-dir --no-deps --wheel-dir /tmp/wheels -r requirements.txt
 
 
 # final stage
@@ -22,8 +22,8 @@ FROM python:3.11-slim-bullseye
 
 WORKDIR /code
 
-COPY --from=builder /prestage/wheels /wheels
-COPY --from=builder /prestage/requirements.txt .
+COPY --from=builder /tmp/wheels /wheels
+COPY --from=builder /tmp/requirements.txt .
 
 RUN set -ex \
     # Create a non-root user
