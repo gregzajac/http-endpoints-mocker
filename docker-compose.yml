@@ -8,15 +8,18 @@ services:
     command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
     volumes:
       - ./mocker-service/app:/app
-    ports:
-      - 8000:8000
+    expose:
+      - 8000
 
-  # nginx:
-  #   container_name: nginx
-  #   build: ./nginx
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   depends_on:
-  #     - mocker
+  nginx:
+    container_name: nginx
+    build: ./nginx
+    volumes:
+      - ./nginx/conf:/etc/nginx/conf.d
+    ports:
+      - 8080:80
+      - 9090:90
+      # - 443:443
+    depends_on:
+      - mocker
 
