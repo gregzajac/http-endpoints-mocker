@@ -7,6 +7,7 @@ Application allowes to simulate HTTP endpoints with dedicated data in various fo
 ## Contents
 
 * [More about project](#more-about-project)
+* [Examples of use](#examples-of-use)
 * [Setup](#setup)
 * [Technology](#technology)
 
