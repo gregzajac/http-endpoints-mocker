@@ -1,4 +1,4 @@
-"""Module providing connection to the database."""
+"""Module providing connection to the the database."""
 
 import logging
 from contextlib import contextmanager
@@ -37,6 +37,11 @@ mocked_db["endpoint/1.xml"] = {
     "content-type": "application/xml",
     "created": datetime(2023, 6, 1, 10, 15, 45),
 }
+mocked_db["endpoint/1.md5"] = {
+    "data": "1e651ba4c5bcb60c6f796013d920a335",
+    "content-type": "text/html",
+    "created": datetime(2023, 6, 1, 10, 15, 45),
+}
 mocked_db["endpoint/2.json"] = {
     "data": """{"menu": {
                     "id": "file",
@@ -61,7 +66,3 @@ def session() -> dict[str, dict]:
     except Exception:
         logger.exception("Not connected to the database")
         raise
-
-
-with session() as ses:
-    print(list(ses))
