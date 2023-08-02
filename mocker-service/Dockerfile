@@ -20,7 +20,7 @@ RUN pip wheel --no-cache-dir --no-deps --wheel-dir /tmp/wheels -r requirements.t
 # final stage
 FROM python:3.11-slim-bullseye
 
-WORKDIR /app
+WORKDIR /code
 
 COPY --from=builder /tmp/wheels /wheels
 COPY --from=builder /tmp/requirements.txt .
@@ -39,6 +39,6 @@ RUN set -ex \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ./mocker .
+COPY . .
 
 USER appuser
