@@ -1,9 +1,9 @@
-"""Concrete API implementations, based on given database."""
+"""Repositories module."""
 
 from contextlib import AbstractContextManager
 from typing import Callable
 
-from db import session
+from mocker.db import session
 
 
 class EndpointRepository:

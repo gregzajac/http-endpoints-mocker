@@ -39,6 +39,6 @@ RUN set -ex \
     && apt-get clean -y \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ./app .
+COPY ./mocker .
 
 USER appuser

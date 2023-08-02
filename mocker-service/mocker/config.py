@@ -1,4 +1,4 @@
-"""Configuration settings for the mocker-service."""
+"""Configuration settings."""
 
 import os
 
