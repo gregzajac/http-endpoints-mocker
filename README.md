@@ -103,7 +103,7 @@ docker compose down -v
 
 ## Technology
 
-* Python 3.11.2
+* Python 3.11
 * FastAPI 0.100.0
 * Pytest 7.4.0
 * Nginx 1.24
