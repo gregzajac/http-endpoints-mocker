@@ -1,0 +1,4 @@
+[tool.isort]
+profile = "black"
+src_paths = ["mocker-service/mocker"]
+lines_after_imports = 2

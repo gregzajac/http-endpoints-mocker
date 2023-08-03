@@ -5,9 +5,11 @@ services:
   mocker:
     container_name: mocker
     build: ./mocker-service
-    command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
+    env_file:
+      - .env
+    command: uvicorn mocker.main:app --reload --host 0.0.0.0 --port 8000
     volumes:
-      - ./mocker-service/app:/app
+      - ./mocker-service:/code
     expose:
       - 8000
 

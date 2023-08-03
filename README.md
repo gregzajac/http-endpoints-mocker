@@ -21,18 +21,41 @@ So I can use it to test my tool for importing external data.
 
 ## Examples of use
 
-1. GET info about working Nginx
+1. GET info from Nginx:
 
     ```bash
-    curl localhost:9090
+    $ curl localhost:9090
     healthy
     ```
 
-2. GET mocked data from the endpoint
+2. GET mocked XML:
 
     ```bash
-    curl localhost:8080
-    "Placeholder!"
+    $ curl localhost:8080/api/sub-url/file.xml
+    <menu id="file" value="File">
+        <popup>
+            <menuitem value="New" onclick="CreateNewDoc()" />
+            <menuitem value="Open" onclick="OpenDoc()" />
+            <menuitem value="Close" onclick="CloseDoc()" />
+        </popup>
+    </menu>
+    ```
+
+3. GET mocked JSON:
+
+    ```bash
+    $ curl localhost:8080/api/sub-url/file.json
+    {"menu": {
+        "id": "file",
+        "value": "File",
+        "popup": {
+            "menuitem": [
+                {"value": "New", "onclick": "CreateNewDoc()"},
+                {"value": "Open", "onclick": "OpenDoc()"},
+                {"value": "Close", "onclick": "CloseDoc()"}
+            ]
+        }
+    }}
     ```
 
 ## Setup
@@ -43,7 +66,7 @@ So I can use it to test my tool for importing external data.
     git clone https://github.com/gregzajac/http-endpoints-mocker.git
     ```
 
-2. Create virtual environment and install requirements
+2. Create virtual environment and install requirements:
 
     ```bash
     cd http http-endpoints-mocker
@@ -60,13 +83,19 @@ So I can use it to test my tool for importing external data.
 
 ### Note
 
-Close application with command
+Run tests with command:
+
+```bash
+docker compose exec mocker pytest -p no:cacheprovider
+```
+
+Close the application with command:
 
 ```bash
 docker compose down
 ```
 
-or close with deleting volumes if needed
+or close with deleting volumes if needed:
 
 ```bash
 docker compose down -v
@@ -74,8 +103,9 @@ docker compose down -v
 
 ## Technology
 
-* Python 3.11.2
+* Python 3.11
 * FastAPI 0.100.0
+* Pytest 7.4.0
 * Nginx 1.24
 * Docker 24.0.5
 * Docker Compose 2.3.3
