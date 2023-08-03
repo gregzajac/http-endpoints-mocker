@@ -7,7 +7,7 @@ from mocker.db import session
 
 
 class EndpointRepository:
-    """Implementation of the Endpoint API."""
+    """An implementation of the Endpoint API."""
 
     def __init__(
         self,
@@ -35,17 +35,17 @@ class EndpointRepository:
 
 
 class EndpointNotFoundError(Exception):
-    """Endpoint was not found in the repository."""
+    """The endpoint was not found in the repository."""
 
     def __init__(self, endpoint_url):
         super().__init__(f"Endpoint not found, id: {endpoint_url}")
 
 
 class EndpointDuplicatedError(Exception):
-    """Endpoint with this URL already exists in the repository."""
+    """The endpoint already exists in the repository."""
 
     def __init__(self, endpoint_url):
-        super().__init__(f"Endpoint with this URL already exists, id: {endpoint_url}")
+        super().__init__(f"Endpoint already exists, id: {endpoint_url}")
 
 
 endpoint_repository = EndpointRepository(session)
