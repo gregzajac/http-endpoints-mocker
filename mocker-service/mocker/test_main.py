@@ -1,32 +1,46 @@
 """Tests module."""
 
-from unittest.mock import patch
-
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from mocker.db import mocked_db
+from mocker.database import (
+    add_data_to_db,
+    db_example_json,
+    db_example_md5,
+    db_example_xml,
+    db_storage,
+    remove_data_from_db,
+)
 from mocker.main import app
-from mocker.repositories import EndpointNotFoundError
-
-
-@pytest.fixture
-def client():
-    yield TestClient(app)
 
 
 @pytest.fixture
 def db():
-    return mocked_db
+    try:
+        examples = db_example_xml | db_example_md5 | db_example_json
+        add_data_to_db(db_storage, examples)
+        yield db_storage
+    finally:
+        remove_data_from_db(db_storage)
 
 
-def test_read_main(client):
+@pytest.fixture
+def client(db):
+    yield TestClient(app)
+
+
+def test_app():
+    assert isinstance(app, FastAPI)
+
+
+def test_get_root(client):
     """
     GIVEN a test client to the API
-    WHEN a Request is send to the root URL
-    THEN obtain a Response with a status code 200 OK
-    and with Content-Type "application/json"
-    and with a placeholder text
+    WHEN send a GET Request to the root URL
+    THEN obtain a Response with status code 200 OK
+    and obtain a Response with Content-Type "application/json"
+    and obtain a Response with a placeholder text
     """
     response = client.get("/")
     assert response.status_code == 200
@@ -34,39 +48,132 @@ def test_read_main(client):
     assert response.json() == "Placeholder!"
 
 
-def test_get_by_url_success(client, db):
+def test_get_endpoints(client):
     """
     GIVEN a test client to the API
-    and an access to the test database
-    WHEN a Request is send to the URL existing in the database
+    WHEN send a GET Request to the `endpoints/` URL
     THEN obtain a Response with a status code 200 OK
-    and with correct Content-Type in a Response header
-    and with correct URL data
+    and obtain a Response with Content-Type "application/json"
+    and obtain a Response with mocked database data.
     """
-    url, url_data = db.popitem()
+    response = client.get("/endpoints/")
+    assert response.status_code == 200
+    assert response.headers["Content-Type"] == "application/json"
+    assert len(response.json()) == 3
 
-    with patch(
-        "mocker.repositories.endpoint_repository.get_by_url", return_value=url_data
-    ):
-        response = client.get("/api/" + url)
+
+def test_get_endpoint_success(client):
+    """
+    GIVEN a test client to the API
+    WHEN send a GET Request to the existing URL with XML
+    THEN obtain a Response with a status code 200 OK
+    and obtain a Response with Content-Type "application/xml"
+    and obtain a Response with XML data.
+    """
+    url, data = list(db_example_xml.items())[0]
+
+    response = client.get("/endpoints/" + url)
 
     assert response.status_code == 200
-    assert response.headers["Content-Type"] == url_data["content_type"]
-    assert response.content.decode() == url_data["content"]
+    assert response.headers["Content-Type"] == data["content_type"]
+    assert response.content.decode() == data["content"]
 
 
-def test_get_by_url_failure_not_found_url(client):
+def test_get_endpoint_failure_not_found_url(client):
     """
     GIVEN a test client to the API
-    WHEN a Request is send to the URL not existing in the database
+    WHEN send a GET Request to the unknown URL with XML
     THEN obtain a Response with a status code 404 NOT FOUND
     """
-    wrong_url = "some-wrong-url/next-part/1.xml"
+    unknown_url = "some-wrong-url/next-part/1.xml"
 
-    with patch(
-        "mocker.repositories.endpoint_repository.get_by_url",
-        side_effect=EndpointNotFoundError(wrong_url),
-    ):
-        response = client.get(wrong_url)
+    response = client.get(unknown_url)
 
     assert response.status_code == 404
+
+
+def test_add_endpoint_xml_success(client):
+    """
+    GIVEN a test client to the API
+    WHEN send a POST Request to the new URL with XML
+    THEN obtain a Response with a status code 201 CREATED
+    and obtain a Response with Content-Type "text/html; charset=utf-8"
+    and new URL with XML exists in Response
+    and MD5 URL from XML URL exists in Response
+    """
+    new_xml_url = "sub-url/newfile.xml"
+    url_md5_from_xml = "sub-url/newfile.md5"
+
+    post_data = {
+        "url": new_xml_url,
+        "content": "content for new xml",
+        "endpoint_type": "XML",
+    }
+    response = client.post("/endpoints/", json=post_data)
+
+    assert response.status_code == 201
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert new_xml_url in response.content.decode()
+    assert url_md5_from_xml in response.content.decode()
+
+
+def test_add_endpoint_xml_failure_endpoint_already_exists(client):
+    """
+    GIVEN a test client to the API
+    WHEN send a POST Request to the existing URL with XML
+    THEN obtain a Response with a status code 409 Conflict
+    """
+    url, data = list(db_example_xml.items())[0]
+
+    post_data = {
+        "url": url,
+        "content": data["content"],
+        "endpoint_type": "XML",
+    }
+    response = client.post("/endpoints/", json=post_data)
+
+    assert response.status_code == 409
+
+
+def test_add_endpoint_json_success(client):
+    """
+    GIVEN a test client to the API
+    WHEN send a POST Request to the new URL with JSON
+    THEN obtain a Response with a status code 201 CREATED
+    and obtain a Response with Content-Type "text/html; charset=utf-8"
+    and new URL with XML exists in Response
+    and MD5 URL from XML URL exists in Response
+    """
+    new_json_url = "sub-url/newfile.json"
+
+    post_data = {
+        "url": new_json_url,
+        "content": "content for new xml",
+        "endpoint_type": "XML",
+    }
+    response = client.post("/endpoints/", json=post_data)
+
+    assert response.status_code == 201
+    assert response.headers["Content-Type"] == "text/html; charset=utf-8"
+    assert new_json_url in response.content.decode()
+
+
+def test_add_endpoint_json_failure_endpoint_already_exists(client):
+    """
+    GIVEN a test client to the API
+    WHEN send a POST Request to the existing URL with JSON
+    THEN obtain a Response with a status code 409 Conflict
+    """
+    url, data = list(db_example_json.items())[0]
+
+    post_data = {
+        "url": url,
+        "content": data["content"],
+        "endpoint_type": "XML",
+    }
+    response = client.post("/endpoints/", json=post_data)
+
+    assert response.status_code == 409
+
+
+# TODO: test_add_endpoint_xml_failure_cannot_create_md5
