@@ -21,42 +21,7 @@ So I can use it to test my tool for importing external data.
 
 ## Examples of use
 
-1. GET info from Nginx:
-
-    ```bash
-    $ curl localhost:9090
-    healthy
-    ```
-
-2. GET mocked XML:
-
-    ```bash
-    $ curl localhost:8080/api/sub-url/file.xml
-    <menu id="file" value="File">
-        <popup>
-            <menuitem value="New" onclick="CreateNewDoc()" />
-            <menuitem value="Open" onclick="OpenDoc()" />
-            <menuitem value="Close" onclick="CloseDoc()" />
-        </popup>
-    </menu>
-    ```
-
-3. GET mocked JSON:
-
-    ```bash
-    $ curl localhost:8080/api/sub-url/file.json
-    {"menu": {
-        "id": "file",
-        "value": "File",
-        "popup": {
-            "menuitem": [
-                {"value": "New", "onclick": "CreateNewDoc()"},
-                {"value": "Open", "onclick": "OpenDoc()"},
-                {"value": "Close", "onclick": "CloseDoc()"}
-            ]
-        }
-    }}
-    ```
+Application provides the API documentation with URL: `http://localhost:8080/docs` \
 
 ## Setup
 
