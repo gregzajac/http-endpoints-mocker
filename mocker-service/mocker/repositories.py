@@ -1,10 +1,9 @@
 """Repositories module."""
 
-from contextlib import AbstractContextManager
 from datetime import datetime
 from typing import Callable
 
-from mocker.database import session
+from mocker.database import DbStorage
 
 
 class EndpointRepository:
@@ -12,7 +11,7 @@ class EndpointRepository:
 
     def __init__(
         self,
-        session_factory: Callable[..., AbstractContextManager[dict]],
+        session_factory: Callable[..., DbStorage],
     ) -> None:
         self.session_factory = session_factory
 
@@ -23,32 +22,32 @@ class EndpointRepository:
     def get_by_url(self, url: str) -> dict:
         with self.session_factory() as session:
             endpoint_data = session.get(url)
-            if not endpoint_data:
-                raise EndpointNotFoundError(url)
-            return endpoint_data
+        if not endpoint_data:
+            raise EndpointNotFoundError(url)
+        return endpoint_data
 
     def add(
         self, url: str, content: str, content_type: str, endpoint_type: str
     ) -> None:
         with self.session_factory() as session:
             endpoint = session.get(url)
-            if endpoint:
-                raise EndpointDuplicatedError(url)
-            data = {
-                "content": content,
-                "content_type": content_type,
-                "endpoint_type": endpoint_type,
-                "created": datetime.now(),
-            }
-            session.update({url: data})
+        if endpoint:
+            raise EndpointDuplicatedError(url)
+        data = {
+            "content": content,
+            "content_type": content_type,
+            "endpoint_type": endpoint_type,
+            "created": datetime.now(),
+        }
+        session.update({url: data})
 
     def remove(self, url: str):
         with self.session_factory() as session:
             endpoint = session.get(url)
-            if not endpoint:
-                raise EndpointNotFoundError(url)
-            removed = session.pop(url)
-            return removed
+        if not endpoint:
+            raise EndpointNotFoundError(url)
+        removed = session.pop(url)
+        return removed
 
 
 class EndpointNotFoundError(Exception):
@@ -63,6 +62,3 @@ class EndpointDuplicatedError(Exception):
 
     def __init__(self, endpoint_url):
         super().__init__(f"Endpoint already exists, URL: {endpoint_url}")
-
-
-# endpoint_repository = EndpointRepository(session)
