@@ -19,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 app = FastAPI(title=settings.PROJECT_NAME, version=settings.PROJECT_VERSION)
+
 endpoint_repository = EndpointRepository(session)
 
 

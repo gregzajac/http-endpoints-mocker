@@ -3,6 +3,7 @@
 import logging
 from contextlib import contextmanager
 from datetime import datetime
+from typing import Generator
 
 
 logger = logging.getLogger(__name__)
@@ -84,7 +85,7 @@ db_storage = DbStorage()
 
 
 @contextmanager
-def session() -> dict[str, dict]:
+def session() -> Generator:
     try:
         yield db_storage
     except Exception:
