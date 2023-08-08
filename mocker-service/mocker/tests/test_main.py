@@ -1,33 +1,10 @@
-"""Tests module."""
+"""Tests of the main module."""
 
-import pytest
+
 from fastapi import FastAPI
-from fastapi.testclient import TestClient
 
-from mocker.database import (
-    add_data_to_db,
-    db_example_json,
-    db_example_md5,
-    db_example_xml,
-    db_storage,
-    remove_data_from_db,
-)
+from mocker.database import db_example_json, db_example_xml
 from mocker.main import app
-
-
-@pytest.fixture
-def db():
-    try:
-        examples = db_example_xml | db_example_md5 | db_example_json
-        add_data_to_db(db_storage, examples)
-        yield db_storage
-    finally:
-        remove_data_from_db(db_storage)
-
-
-@pytest.fixture
-def client(db):
-    yield TestClient(app)
 
 
 def test_app():
@@ -62,7 +39,7 @@ def test_get_endpoints(client):
     assert len(response.json()) == 3
 
 
-def test_get_endpoint_success(client):
+def test_get_endpoint_success(client, example_xml):
     """
     GIVEN a test client to the API
     WHEN send a GET Request to the existing URL with XML
@@ -70,7 +47,7 @@ def test_get_endpoint_success(client):
     and obtain a Response with Content-Type "application/xml"
     and obtain a Response with XML data.
     """
-    url, data = list(db_example_xml.items())[0]
+    url, data = list(example_xml.items())[0]
 
     response = client.get("/endpoints/" + url)
 
@@ -79,14 +56,12 @@ def test_get_endpoint_success(client):
     assert response.content.decode() == data["content"]
 
 
-def test_get_endpoint_failure_not_found_url(client):
+def test_get_endpoint_failure_not_found_url(client, unknown_url):
     """
     GIVEN a test client to the API
     WHEN send a GET Request to the unknown URL with XML
     THEN obtain a Response with a status code 404 NOT FOUND
     """
-    unknown_url = "some-wrong-url/next-part/1.xml"
-
     response = client.get(unknown_url)
 
     assert response.status_code == 404
