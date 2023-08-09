@@ -76,7 +76,7 @@ def add_data_to_db(db: DbStorage, db_data: dict[str, dict]) -> None:
         db[key] = value
 
 
-def remove_data_from_db(db: DbStorage) -> None:
+def clear_db(db: DbStorage) -> None:
     db.clear()
 
 
