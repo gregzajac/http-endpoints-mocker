@@ -3,7 +3,6 @@
 
 from fastapi import FastAPI
 
-from mocker.database import db_example_json, db_example_xml
 from mocker.main import app
 
 
@@ -92,13 +91,13 @@ def test_add_endpoint_xml_success(client):
     assert url_md5_from_xml in response.content.decode()
 
 
-def test_add_endpoint_xml_failure_endpoint_already_exists(client):
+def test_add_endpoint_xml_failure_endpoint_already_exists(client, example_xml):
     """
     GIVEN a test client to the API
     WHEN send a POST Request to the existing URL with XML
     THEN obtain a Response with a status code 409 Conflict
     """
-    url, data = list(db_example_xml.items())[0]
+    url, data = list(example_xml.items())[0]
 
     post_data = {
         "url": url,
@@ -133,13 +132,13 @@ def test_add_endpoint_json_success(client):
     assert new_json_url in response.content.decode()
 
 
-def test_add_endpoint_json_failure_endpoint_already_exists(client):
+def test_add_endpoint_json_failure_endpoint_already_exists(client, example_json):
     """
     GIVEN a test client to the API
     WHEN send a POST Request to the existing URL with JSON
     THEN obtain a Response with a status code 409 Conflict
     """
-    url, data = list(db_example_json.items())[0]
+    url, data = list(example_json.items())[0]
 
     post_data = {
         "url": url,

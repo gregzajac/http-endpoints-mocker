@@ -5,11 +5,11 @@ from fastapi.testclient import TestClient
 
 from mocker.database import (
     add_data_to_db,
+    clear_db,
     db_example_json,
     db_example_md5,
     db_example_xml,
     db_storage,
-    remove_data_from_db,
 )
 from mocker.main import app
 
@@ -21,7 +21,7 @@ def db():
         add_data_to_db(db_storage, examples)
         yield db_storage
     finally:
-        remove_data_from_db(db_storage)
+        clear_db(db_storage)
 
 
 @pytest.fixture
