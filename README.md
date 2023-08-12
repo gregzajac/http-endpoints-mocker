@@ -51,6 +51,12 @@ Application provides the API documentation with URL: `http://localhost:8080/docs
 Run tests with command:
 
 ```bash
+tox
+```
+
+or during the working docker compose:
+
+```bash
 docker compose exec mocker pytest -p no:cacheprovider
 ```
 
